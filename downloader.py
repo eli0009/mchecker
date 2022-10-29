@@ -7,16 +7,8 @@ class Download:
     """Download a web page using different methods."""
 
     def __init__(self, url=None):
-        #convert course code to url
-        self.course_code = None
 
-        p = re.compile(r'[A-Z]{4}-[0-9]{3}')
-        m = p.search(url)
-        if m and len(url) == 8:
-            self.course_code = url
-            self.url = 'https://www.mcgill.ca/study/2022-2023/courses/' + url
-        else:
-            self.url = url
+        self.url = url
         
 
     def request(self, method='GET'):
@@ -32,6 +24,7 @@ class Download:
             return True
         else:
             return False
+        
 
     def get_soup(self, content=None, filename=None):
         """get a BeautifulSoup object from the given content, or filename if
@@ -78,6 +71,43 @@ class Download:
                     codes.append(m.group().replace(' ', '-'))
             return codes
     
+class ProgramsDownload():
+
+    def __init__(self, search):
+        self.search = search
+        self.programs = []
+
+    def course_search(self):
+        """
+        Search courses using McGill api
+        """
+        template = f"https://www.mcgill.ca/study/2022-2023/programs/search?search_api_views_fulltext={self.search.strip().replace(' ', '+')}&sort_by=search_api_relevance&page="
+
+        page = 0
+        while get_courses_from_program_page(template + page):
+            page += 1
+    
+    def get_programs_from_page(self, url):
+        """
+        retrieve every program from a search page
+        return true if there is at least 1 program in the page
+        false otherwise
+        """
+
+        dl = Download(url)
+
+class CourseDownload():
+
+    def __init__(self, code):
+        #convert course code to url
+        self.course_code = None
+
+        p = re.compile(r'[A-Z]{4}-[0-9]{3}')
+        m = p.search(url)
+        if m and len(url) == 8:
+            self.course_code = url
+            self.url = 'https://www.mcgill.ca/study/2022-2023/courses/' + url
+
 
 if __name__ == '__main__':
     
