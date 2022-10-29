@@ -131,7 +131,7 @@ class CourseDownload():
     def __init__(self, code, year='2022-2023'):
 
         #convert course code to url
-        code = code.replace(' ', '-')
+        code = code.replace(' ', '-').upper()
         p = re.compile(r'[A-Z]{4}-[0-9]{3}')
         m = p.search(code)
         if m and len(code) == 8:
@@ -145,7 +145,16 @@ class CourseDownload():
 
         dl = Download(self.url)
         dl.request()
-        print(dl.content)
+
+        sections = dl.content.find_all('p')
+        for section in sections:
+            
+            # Get all restrictions
+            if 'Restriction' in section.text:
+                for course in section.find_all('a', href=True):
+                    self.restrictions.append(course.text.replace(' ', '-'))
+            
+
 
 if __name__ == '__main__':
 
@@ -167,12 +176,13 @@ if __name__ == '__main__':
     """
     Course page
     """
-    # dl = CourseDownload('COMP 409')
-    # dl.overview()
+    dl = CourseDownload('ecse-222')
+    dl.overview()
+    print(dl.restrictions)
 
 
-    dl = Download('https://www.mcgill.ca/study/2022-2023/courses/ecse-551')
-    dl.request()
-    dl.save_soup('doc/ecse-551')
+    # dl = Download('https://www.mcgill.ca/study/2022-2023/courses/ecse-551')
+    # dl.request()
+    # dl.save_soup('doc/ecse-551')
 
 
