@@ -139,6 +139,8 @@ class CourseDownload():
         else:
             raise(Exception("Not a valid course code"))
 
+        self.restrictions = []
+
     def overview(self):
 
         dl = Download(self.url)
@@ -146,13 +148,6 @@ class CourseDownload():
         print(dl.content)
 
 if __name__ == '__main__':
-    
-    # url_math = 'https://www.mcgill.ca/mathstat/undergraduate/programs/b-sc/minor-statistics-b-sc'
-    # url = 'https://www.mcgill.ca/study/2022-2023/faculties/engineering/undergraduate/programs/bachelor-engineering-beng-bioengineering'
-
-    # dl = Download(url)
-    # dl.request()
-    # print(dl.get_courses_from_program_page())
 
     """
     Programs search page
@@ -172,7 +167,12 @@ if __name__ == '__main__':
     """
     Course page
     """
-    dl = CourseDownload('COMP 409')
-    dl.overview()
+    # dl = CourseDownload('COMP 409')
+    # dl.overview()
+
+
+    dl = Download('https://www.mcgill.ca/study/2022-2023/courses/ecse-551')
+    dl.request()
+    dl.save_soup('doc/ecse-551')
 
 
