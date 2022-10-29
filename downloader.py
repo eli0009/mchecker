@@ -43,10 +43,45 @@ class Download:
         automatically add html extension if not exist
         Automatically save the document as course_code if given.
         """
-        if self.course_code:
-            filename = self.course_code
         with open(filename + '.html', 'w') as fp:
             print(self.content.prettify(), file=fp)
+    
+class ProgramsDownload():
+
+    def __init__(self, search):
+        self.template = f"https://www.mcgill.ca/study/2022-2023/programs/search?search_api_views_fulltext={search.strip().replace(' ', '+')}&sort_by=search_api_relevance&page="
+    
+        self.programs = []
+
+    def course_search(self):
+        """
+        Search courses using McGill api
+        """
+
+        page = 0
+        while get_courses_from_program_page(self.template + page):
+            page += 1
+    
+    def get_programs_from_page(self, url):
+        """
+        retrieve every program from a search page
+        return true if there is at least 1 program in the page
+        false otherwise
+        """
+
+        dl = Download(url)
+
+class CourseDownload():
+
+    def __init__(self, code):
+        #convert course code to url
+        self.course_code = None
+
+        p = re.compile(r'[A-Z]{4}-[0-9]{3}')
+        m = p.search(url)
+        if m and len(url) == 8:
+            self.course_code = url
+            self.url = 'https://www.mcgill.ca/study/2022-2023/courses/' + url
 
     def get_courses_from_program_page(self):
         """
@@ -70,43 +105,6 @@ class Download:
                 if m.group():
                     codes.append(m.group().replace(' ', '-'))
             return codes
-    
-class ProgramsDownload():
-
-    def __init__(self, search):
-        self.search = search
-        self.programs = []
-
-    def course_search(self):
-        """
-        Search courses using McGill api
-        """
-        template = f"https://www.mcgill.ca/study/2022-2023/programs/search?search_api_views_fulltext={self.search.strip().replace(' ', '+')}&sort_by=search_api_relevance&page="
-
-        page = 0
-        while get_courses_from_program_page(template + page):
-            page += 1
-    
-    def get_programs_from_page(self, url):
-        """
-        retrieve every program from a search page
-        return true if there is at least 1 program in the page
-        false otherwise
-        """
-
-        dl = Download(url)
-
-class CourseDownload():
-
-    def __init__(self, code):
-        #convert course code to url
-        self.course_code = None
-
-        p = re.compile(r'[A-Z]{4}-[0-9]{3}')
-        m = p.search(url)
-        if m and len(url) == 8:
-            self.course_code = url
-            self.url = 'https://www.mcgill.ca/study/2022-2023/courses/' + url
 
 
 if __name__ == '__main__':
