@@ -53,6 +53,7 @@ class ProgramsDownload():
         self.template = f"https://www.mcgill.ca/study/{year}/programs/search?search_api_views_fulltext={search.strip().replace(' ', '+')}&sort_by=search_api_relevance&page="
     
         self.programs = {}
+        self.course_search()
 
     def course_search(self):
         """
@@ -85,7 +86,7 @@ class ProgramsDownload():
         return has_result
 
     def __str__(self):
-        return pprint.pformat(self.programs)
+        return pprint.pformat(self.programs, width=200)
 
     def __len__(self):
         return len(self.programs)
@@ -96,6 +97,7 @@ class CoursesDownload():
     def __init__(self, url):
         #convert course code to url
         self.url = url
+        self.courses = self.get_courses_from_program_page()
 
     def get_courses_from_program_page(self):
         """
@@ -104,28 +106,44 @@ class CoursesDownload():
         COMP 551
         ECSE 539
         """
-        course_numbers = self.content.find_all('a',
+        dl = Download(self.url)
+        dl.request()
+        course_numbers = dl.content.find_all('a',
                                                 {'class': 'program-course-title'})
         
-        codes = []
+        codes = {}
         p = re.compile(r'[A-Z]{4} [0-9]{3}')
         for course_number in course_numbers:
             m = p.search(course_number.text)
             if m.group():
-                codes.append(m.group().replace(' ', '-'))
+                codes[(m.group().replace(' ', '-'))] = course_number.text.strip().strip('*').strip()
         return codes
+
+    def __str__(self):
+        return pprint.pformat(self.courses, width=200)
+
+    def __len__(self):
+        return len(self.courses)
+
 
 class CourseDownload():
 
-    def __init__(self, code):
-        #convert course code to url
-        self.course_code = None
+    def __init__(self, code, year='2022-2023'):
 
+        #convert course code to url
+        code = code.replace(' ', '-')
         p = re.compile(r'[A-Z]{4}-[0-9]{3}')
-        m = p.search(url)
-        if m and len(url) == 8:
-            self.course_code = url
-            self.url = 'https://www.mcgill.ca/study/2022-2023/courses/' + url
+        m = p.search(code)
+        if m and len(code) == 8:
+            self.url = f'https://www.mcgill.ca/study/{year}/courses/' + code
+        else:
+            raise(Exception("Not a valid course code"))
+
+    def overview(self):
+
+        dl = Download(self.url)
+        dl.request()
+        print(dl.content)
 
 if __name__ == '__main__':
     
@@ -139,14 +157,22 @@ if __name__ == '__main__':
     """
     Programs search page
     """
-    dl = ProgramsDownload('bio eng')
-    dl.course_search()
-    print(dl)
-    print(len(dl))
+    # dl = ProgramsDownload('software engineering')
+    # print(dl)
+    # print(len(dl))
 
     """
     Courses listing page
     """
-    url = 'https://www.mcgill.ca/study/2022-2023/faculties/engineering/graduate/programs/master-engineering-meng-materials-engineering-non-thesis'
+    # url = 'https://www.mcgill.ca/study/2022-2023/faculties/engineering/undergraduate/programs/bachelor-engineering-beng-co-op-software-engineering'
+    # dl = CoursesDownload(url)
+    # print(dl)
+    # print(len(dl))
+
+    """
+    Course page
+    """
+    dl = CourseDownload('COMP 409')
+    dl.overview()
 
 
