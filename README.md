@@ -6,13 +6,12 @@ A program to make McGill course selection easier.
 
 ## Features
 
-- Scrap for all offered courses in a program's course listing page (listing of all programs can be found [HERE](https://www.mcgill.ca/study/2022-2023/programs/search)).
+### API
 
-Example: https://www.mcgill.ca/study/2022-2023/faculties/science/undergraduate/programs/bachelor-science-bsc-major-software-engineering
+- Search for available programs and get all results
+- Scrap for all offered courses in a program's course listing page
+- Get all restrictions for a course
 
-- Additional support for scraping the [math and statistics faculty](https://www.mcgill.ca/mathstat/undergraduate/programs/)'s undergraduate programs course listing pages: 
-
-Example: https://www.mcgill.ca/mathstat/undergraduate/programs/b-sc/minor-statistics-b-sc 
 
 
 
